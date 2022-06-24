@@ -13,7 +13,7 @@
             (theLSLength 0)
             (theLSIndex 0)
             (theLSSTS 1)
-            (theFileTypes #(".jpg" ".png"))
+            (theFileTypes #(".jpg" ".png" ".ppm"))
             (theChosenFileType (vector-ref theFileTypes inFileType))
             (theExportFile "")
             (theLayerHeight 10)
@@ -30,6 +30,8 @@
             ;png export parameters
             (png-run-mode 0) (png-image 0) (png-drawable 0) (png-filename "") (png-raw-filename "") (png-interlace 0) 
             (png-compression 9) (png-bkgd 1) (png-gama 0) (png-offs 0) (png-phys 0) (png-time 1) (png-comment 0) (png-svtrans 0)
+            ;ppm export parameters
+            (ppm-run-mode 0) (ppm-image 0) (ppm-drawable 0) (ppm-filename "") (ppm-raw-filename "") (ppm-raw 1)
           )
           ;create new image with theHeight and theWidth
           (set! theNewImage (car (gimp-image-new theLayerWidth theLayerHeight theImageType)))
@@ -140,6 +142,25 @@
                 )
               )
             )
+            (if (= 2 inFileType)
+              ; export to ppm
+              (begin
+                (set! ppm-image theNewImage)
+                (set! ppm-drawable theNewLayer)
+                (set! ppm-filename theExportFile)
+                (set! ppm-raw-filename theExportFile)
+                (if (= 0 theCurrentLayer)
+                  (begin
+                    (set! ppm-run-mode 0)
+                    (file-ppm-save ppm-run-mode ppm-image ppm-drawable ppm-filename ppm-raw-filename ppm-raw)
+                  )
+                  (begin
+                    (set! ppm-run-mode 2)
+                    (gimp-file-save ppm-run-mode ppm-image ppm-drawable ppm-filename ppm-raw-filename)
+                  )
+                )
+              )
+            )
             ;increament of theCurrentLayer
             (set! theCurrentLayer (+ theCurrentLayer 1))
             ;gimp progress increase
@@ -168,7 +189,7 @@
     SF-IMAGE       "Image"                        0
     SF-DRAWABLE    "Drawable"                     0
     SF-DIRNAME     "Output Folder"                ""
-    SF-OPTION      "File Type (Extension)"        '("jpg" "png")
+    SF-OPTION      "File Type (Extension)"        '("jpg" "png" "ppm")
     SF-TOGGLE      "Remove extension from layer name; Note: avoid using dots (.) in layer name"
                                                   TRUE
 )
